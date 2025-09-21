@@ -8,19 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('transactions', function (Blueprint $table) {
+        Schema::create('transaction_item', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique(); // Kolom invoice_number, NOT NULL, unik
+            $table->foreignId('transaction_id')->constrained()->onDelete('cascade');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->enum('type', ['masuk', 'keluar']);
             $table->integer('quantity');
-            $table->text('description')->nullable();
+            $table->decimal('price', 10, 2);
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('transactions');
+        Schema::dropIfExists('transaction_item');
     }
 };

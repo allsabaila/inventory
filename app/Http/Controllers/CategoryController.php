@@ -8,16 +8,16 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of categories.
      */
     public function index()
     {
-        $items = Category::all();
-        return view('categories.index', compact('items'));
+        $categories = Category::latest()->paginate(10);
+        return view('categories.index', compact('categories'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new category.
      */
     public function create()
     {
@@ -25,64 +25,53 @@ class CategoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created category in storage.
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
-        ]); //validasi semua inputan user
-
-        Category::create($request->all());  //memasukan hasil validasi ke db lewat model kalau lolos validasi
-
-        return redirect()->route('categories.index') //user dialihkan ke hal index
-                         ->with('success', 'Categories created succesfully');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Category $category)
-    {
-        //$category = Category::with('tabel yg relasi dgn ini')->find($category->id);
-        return view('categories.show', compact('category'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //mengambil data dulu (mirip sama create)
-        return view('categories.edit', compact('category'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Category $category)
-    {
-        //mirip store 
-        $request->validate([
+        $validated = $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $category->update($request->all());
+        Category::create($validated);
 
         return redirect()->route('categories.index')
-                         ->with('success', 'Kategori berhasil diperbarui.');
+            ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Show the form for editing the specified category.
+     */
+    public function edit(Category $category)
+    {
+        return view('categories.edit', compact('category'));
+    }
+
+    /**
+     * Update the specified category in storage.
+     */
+    public function update(Request $request, Category $category)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $category->update($validated);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Kategori berhasil diperbarui.');
+    }
+
+    /**
+     * Remove the specified category from storage.
      */
     public function destroy(Category $category)
     {
         $category->delete();
 
         return redirect()->route('categories.index')
-                         ->with('success', 'Kategori berhasil dihapus.');
+            ->with('success', 'Kategori berhasil dihapus.');
     }
 }
